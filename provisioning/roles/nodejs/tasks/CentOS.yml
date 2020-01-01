@@ -1,0 +1,36 @@
+---
+
+# NodeJS
+# - name: Install NodeJS repo
+#   sudo: True
+#   shell: "curl -sL https://rpm.nodesource.com/setup | bash -"
+#   tags: installation
+#   args:
+#     chdir: "/tmp"
+
+- name: Download NodeJS setup script
+  get_url:
+      url=https://rpm.nodesource.com/setup
+      dest=/tmp/node-setup
+      timeout=240
+      mode=0777
+  tags: installation
+
+- name: Install NodeJS repo
+  sudo: True
+  command: /bin/bash /tmp/node-setup
+  tags: installation
+
+- name: NodeJS repo script cleanup
+  sudo: True
+  shell: "rm -rf /tmp/node-setup"
+  tags: installation
+
+- name: Install NodeJS
+  yum: name={{item}} state=present update_cache=yes
+  tags: installation
+  with_items:
+    - nodejs
+    - gcc-c++
+    - openssl-devel
+    - make

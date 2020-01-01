@@ -1,0 +1,6 @@
+{
+  "couchbase": {
+    "server": "couchbase1.dev",
+    "beer_bucket": "beer-sample"
+  }
+}

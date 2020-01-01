@@ -1,0 +1,42 @@
+---
+
+- include: CentOS.yml
+  when: ansible_distribution  == "CentOS"
+
+- name: Install global npm packages
+  shell: npm install -g {{ item }}
+  with_items: nodejs_global_packages
+
+- name: Check list of Node.js apps running
+  command: forever list
+  register: forever_list
+  changed_when: false
+
+# - name: Generate Express App
+#   shell: express {{ nodejs_app_dir }}
+
+# - name: NPM Install Express App
+#   shell: npm install
+#   args:
+#     chdir: "{{ nodejs_app_dir }}"
+
+- name: Install local npm packages
+  shell: npm install {{ item }} --save
+  with_items:
+    - couchbase
+  args:
+    chdir: "{{ nodejs_app_dir }}"
+
+- name: Start NodeJS app
+  shell: forever start -w bin/www
+  when: forever_list.stdout.find('bin/www') == -1
+  args:
+    chdir: "{{ nodejs_app_dir }}"
+
+# - name: Start NodeJS app
+#   shell: npm start &
+#   args:
+#     chdir: "{{ nodejs_app_dir }}"
+
+# - name: Wait for WebUi
+#   wait_for: port=3000 delay=10

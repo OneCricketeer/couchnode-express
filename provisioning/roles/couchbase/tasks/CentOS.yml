@@ -1,0 +1,23 @@
+---
+
+# Couchbase Server Enterprise Edition
+# - name: Download Couchbase
+#   get_url: "url={{ couchbase_server_centos_ee_url }} dest=/tmp/{{ couchbase_server_centos_ee_package }} sha256sum={{ couchbase_server_centos_ee_sha256 }} timeout=240"
+#   when: couchbase_server_edition == "enterprise"
+#   tags: installation
+
+- name: Copy Couchbase RPM
+  copy: src={{ couchbase_server_centos_ee_package }} dest=/tmp/{{ couchbase_server_centos_ee_package }}
+  when: couchbase_server_edition == "enterprise"
+  tags: installation
+
+- name: Install Couchbase
+  yum: "name=/tmp/{{ couchbase_server_centos_ee_package }} state=present"
+  when: couchbase_server_edition == "enterprise"
+  tags: installation
+
+- name: Couchbase package file cleanup
+  sudo: True
+  shell: "rm -rf /tmp/{{ couchbase_server_centos_ee_package }}"
+  when: couchbase_server_edition == "enterprise"
+  tags: installation

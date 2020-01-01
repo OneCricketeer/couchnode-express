@@ -1,0 +1,7 @@
+---
+
+- name: Update kernel settings
+  command: sysctl -e -p /etc/sysctl.d/couchbase-server.conf
+
+- name: Restart Couchbase Server
+  service: name=couchbase-server state=restarted

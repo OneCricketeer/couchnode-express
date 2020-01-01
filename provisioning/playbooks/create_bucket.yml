@@ -1,0 +1,31 @@
+---
+# File: create_bucket.yml
+# Example Ansible playbook to create a new Couchbase Server bucket
+
+- hosts: couchbase_cluster
+  sudo: False
+  gather_facts: False
+  tasks:
+    - name: Create cluster grouping
+      group_by: key={{ couchbase_server_node_role }}
+
+- hosts: primary
+  sudo: False
+  gather_facts: False
+  vars:
+    couchbase_server_primary_node: "{{hostvars[groups['primary'][0]]['inventory_hostname']}}"
+    couchbase_server_bucket_name: default
+    couchbase_server_bucket_type: couchbase
+    couchbase_server_bucket_ram: 256
+    couchbase_server_bucket_port: 11211
+    couchbase_server_bucket_replica: 1
+  tasks:
+    - name: Wait for Couchbase initilization
+      wait_for: port=8091 delay=5
+
+    - name: Create new bucket
+      shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli bucket-create -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --bucket={{ couchbase_server_bucket_name }} --bucket-type={{ couchbase_server_bucket_type }} --bucket-port={{ couchbase_server_bucket_port }} --bucket-ramsize={{ couchbase_server_bucket_ram }} --bucket-replica={{ couchbase_server_bucket_replica }}"
+
+    - name: Load beer-sample dataset
+      shell: "{{ couchbase_server_home_path }}/bin/cbdocloader -n {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} -u {{ couchbase_server_admin }} -p {{ couchbase_server_password }} -b beer-sample {{ couchbase_server_home_path }}/samples/beer-sample.zip"
+      when: couchbase_config is defined

@@ -1,0 +1,4 @@
+---
+
+nodejs_global_packages: [forever express-generator]
+nodejs_app_dir: /vagrant/nodecellar
